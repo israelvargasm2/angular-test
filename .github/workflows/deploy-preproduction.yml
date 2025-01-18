@@ -1,0 +1,31 @@
+name: Deploy Preproduction
+
+on:
+  push:
+    branches:
+      - preproduction  # Se ejecutará cuando haya cambios en la rama "preproduction"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: 🏗️ Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Instalar dependencias
+        run: npm install
+
+      - name: 🚀 Construir aplicación Angular
+        run: ng build --configuration=preproduction  # Usa la configuración de preproducción
+
+      - name: 🔄 Instalar Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: 📤 Desplegar a Netlify
+        run: netlify deploy --prod --site ${{ secrets.NETLIFY_SITE_ID }} --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --dir=dist/netlify/browser
